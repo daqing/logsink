@@ -5,6 +5,7 @@ import (
 	"io"
 	"math/rand"
 	"os"
+	"os/signal"
 	"path/filepath"
 
 	"github.com/nxadm/tail"
@@ -57,8 +58,13 @@ func main() {
 		}
 	}
 
-	ch := make(chan bool)
-	<-ch
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt)
+
+	<-c
+
+	fmt.Println(Reset, "bye")
+
 }
 
 func tailf(path string, color Color, config tail.Config, last int) error {
