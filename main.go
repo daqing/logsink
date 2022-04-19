@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"io"
-	"math/rand"
 	"os"
 	"os/signal"
 	"path/filepath"
@@ -29,17 +28,20 @@ const (
 
 const n = 5
 
-var colors = [n]Color{Red, Green, Yellow, Purple, Cyan}
+var colors = [n]Color{Green, Yellow, Purple, Cyan, Red}
+
+// global index to assign color
+var idx = 0
 
 func (c Color) String() string {
 	return string(c)
 }
 
-func randColor() Color {
-	idx := rand.Intn(n)
-
-	return colors[idx]
-}
+// func randColor() Color {
+// 	idx := rand.Intn(n)
+//
+// 	return colors[idx]
+// }
 
 func main() {
 	if len(os.Args) < 2 {
@@ -57,7 +59,7 @@ func main() {
 	}
 
 	for _, path := range os.Args[1:] {
-		err := tailf(path, randColor(), config, 10)
+		err := tailf(path, assignColor(), config, 10)
 		if err != nil {
 			panic(err)
 		}
@@ -70,6 +72,18 @@ func main() {
 
 	fmt.Println(Reset, "bye")
 
+}
+
+func assignColor() Color {
+	if idx >= n {
+		idx = 0
+	}
+
+	c := colors[idx]
+
+	idx += 1
+
+	return c
 }
 
 func tailf(path string, color Color, config tail.Config, last int) error {
@@ -85,7 +99,7 @@ func tailf(path string, color Color, config tail.Config, last int) error {
 
 	go func(tag string) {
 		for line := range t.Lines {
-			fmt.Printf("%s===> [%s]\n%s\n", color, tag, line.Text)
+			fmt.Printf("%s===> [%s]: %s\n", color, tag, line.Text)
 		}
 	}(pathTag(path))
 
