@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/signal"
 	"path/filepath"
+	"strings"
 
 	"github.com/nxadm/tail"
 )
@@ -20,6 +21,10 @@ const (
 	Yellow Color = "\033[33m"
 	Purple Color = "\033[35m"
 	Cyan   Color = "\033[36m"
+)
+
+const (
+	SEP = string(filepath.Separator)
 )
 
 const n = 5
@@ -78,13 +83,22 @@ func tailf(path string, color Color, config tail.Config, last int) error {
 		return err
 	}
 
-	base := filepath.Base(path)
-
 	go func(tag string) {
 		for line := range t.Lines {
-			fmt.Printf("%s---> [%s]: %s\n", color, tag, line.Text)
+			fmt.Printf("%s===> [%s]\n%s\n", color, tag, line.Text)
 		}
-	}(base)
+	}(pathTag(path))
 
 	return nil
+}
+
+func pathTag(path string) string {
+	parts := strings.Split(path, SEP)
+	length := len(parts)
+
+	if length < 3 {
+		return path
+	}
+
+	return strings.Join(parts[length-3:length], SEP)
 }
