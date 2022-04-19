@@ -18,17 +18,19 @@ const (
 	Red    Color = "\033[31m"
 	Green  Color = "\033[32m"
 	Yellow Color = "\033[33m"
+	Blue   Color = "\033[34;1m"
 	Purple Color = "\033[35m"
 	Cyan   Color = "\033[36m"
+	White  Color = "\033[37m"
 )
 
 const (
 	SEP = string(filepath.Separator)
 )
 
-const n = 5
+const nColors = 7
 
-var colors = [n]Color{Green, Yellow, Purple, Cyan, Red}
+var colors = [nColors]Color{Green, Yellow, Blue, White, Purple, Cyan, Red}
 
 // global index to assign color
 var idx = 0
@@ -36,12 +38,6 @@ var idx = 0
 func (c Color) String() string {
 	return string(c)
 }
-
-// func randColor() Color {
-// 	idx := rand.Intn(n)
-//
-// 	return colors[idx]
-// }
 
 func main() {
 	if len(os.Args) < 2 {
@@ -71,11 +67,10 @@ func main() {
 	<-c
 
 	fmt.Println(Reset, "bye")
-
 }
 
 func assignColor() Color {
-	if idx >= n {
+	if idx >= nColors {
 		idx = 0
 	}
 
@@ -99,7 +94,7 @@ func tailf(path string, color Color, config tail.Config, last int) error {
 
 	go func(tag string) {
 		for line := range t.Lines {
-			fmt.Printf("%s===> [%s]: %s\n", color, tag, line.Text)
+			fmt.Printf("%s===> [%s]: %s%s\n", color, tag, line.Text, Reset)
 		}
 	}(pathTag(path))
 
