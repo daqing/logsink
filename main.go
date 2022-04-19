@@ -94,7 +94,7 @@ func tailf(path string, color Color, config tail.Config, last int) error {
 
 	go func(tag string) {
 		for line := range t.Lines {
-			fmt.Printf("%s===> [%s]: %s%s\n", color, tag, line.Text, Reset)
+			fmt.Printf("%s===> [%s]:%s %s\n", color, tag, Reset, line.Text)
 		}
 	}(pathTag(path))
 
